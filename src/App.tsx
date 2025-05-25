@@ -1,39 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import Hero from './components/Hero';
-import About from './components/About';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
-import Education from './components/Education';
-import Contact from './components/Contact';
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import ProductGrid from './components/ProductGrid';
+import Cart from './components/Cart';
+import { Product } from './types';
 
-function App() {
-  const [scrollPosition, setScrollPosition] = useState(0);
+const App: React.FC = () => {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<Product[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollPosition(window.scrollY);
-    };
+  const addToCart = (product: Product) => {
+    setCartItems([...cartItems, product]);
+  };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const removeFromCart = (productId: number) => {
+    setCartItems(cartItems.filter(item => item.id !== productId));
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200 transition-colors duration-300">
-      <Navbar scrollPosition={scrollPosition} />
-      <main>
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Education />
-        <Contact />
+    <div className="min-h-screen bg-gray-100">
+      <Navbar 
+        cartItemCount={cartItems.length} 
+        onCartClick={() => setIsCartOpen(true)}
+        onSearch={setSearchQuery}
+      />
+      <main className="container mx-auto px-4 py-8">
+        <ProductGrid 
+          searchQuery={searchQuery}
+          onAddToCart={addToCart}
+        />
       </main>
-      <Footer />
+      <Cart 
+        isOpen={isCartOpen} 
+        onClose={() => setIsCartOpen(false)}
+        items={cartItems}
+        onRemoveItem={removeFromCart}
+      />
     </div>
   );
-}
+};
 
 export default App;
